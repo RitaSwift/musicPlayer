@@ -1,4 +1,4 @@
-package com.joy.player.musicplayer.activity;
+package com.joy.player.activity;
 
 import android.os.Bundle;
 import com.joy.player.musicplayer.activity.BaseActivity;
