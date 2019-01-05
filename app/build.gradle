@@ -9,6 +9,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        renderscriptTargetApi 17
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -21,8 +23,21 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation "com.android.support:recyclerview-v7:26.1.0"
+    implementation 'com.android.support:design:26.1.0'
     testImplementation 'junit:junit:4.12'
+    implementation 'com.facebook.fresco:fresco:0.9.0'
+    implementation 'com.squareup.retrofit:retrofit:1.9.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.github.ksoichiro:android-observablescrollview:1.6.0'
+    implementation 'com.squareup.okhttp:okhttp:2.7.2'
+    implementation 'com.squareup.okhttp:okhttp-urlconnection:2.7.2'
+    implementation 'com.github.promeg:tinypinyin:1.0.0'
+    implementation 'com.google.code.gson:gson:2.3.1'
+    implementation 'com.github.promeg:tinypinyin:1.0.0'
     implementation files('libs/YoumiSdk.jar')
+    implementation files('libs/mail.jar')
+    implementation files('libs/activation.jar')
+    implementation files('libs/additionnal.jar')
 }
