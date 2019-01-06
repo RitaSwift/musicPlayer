@@ -70,6 +70,7 @@
         <activity android:name=".activity.NetItemChangeActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.ArtistDetailActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.RadioDetailActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.LoginActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.LockActivity"
                   android:excludeFromRecents="true"
                   android:exported="false"
