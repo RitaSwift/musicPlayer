@@ -228,7 +228,6 @@ public class HttpUtil {
                 JsonParser parser = new JsonParser();
                 JsonElement el = parser.parse(c);
                 return el.getAsJsonObject();
-
             }
 
         } catch (Exception e) {
@@ -301,6 +300,31 @@ public class HttpUtil {
         }).start();
 
 
+    }
+
+    public static void test(){
+        Request request = new Request.Builder()
+                .url("http://publicobject.com/helloworld.txt")
+                .build();
+
+        Response response = null;
+        try {
+            response = mOkHttpClient.newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (!response.isSuccessful()) try {
+            throw new IOException("Unexpected code " + response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Headers responseHeaders = response.headers();
+        for (int i = 0; i < responseHeaders.size(); i++) {
+            System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
+        }
+
+        System.out.println(response.body().toString());
     }
 
     public static void postUrl(Context context, String j) {
