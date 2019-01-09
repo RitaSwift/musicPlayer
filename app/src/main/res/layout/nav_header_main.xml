@@ -7,12 +7,21 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <ImageView
+    <!--先屏蔽登录背景 0103-->
+  <!--  <ImageView
         android:id="@+id/top_bac"
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:scaleType="centerCrop"
-        android:src="@mipmap/topinfo_ban_bg" />
+        android:src="@mipmap/topinfo_ban_bg" />-->
+
+    <RelativeLayout
+            android:id="@+id/top_bac"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="@mipmap/topinfo_ban_bg">
+
+    </RelativeLayout>
 
     <!--<LinearLayout-->
     <!--android:id="@+id/item1"-->

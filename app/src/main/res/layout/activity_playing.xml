@@ -179,23 +179,28 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:src="@drawable/play_icn_dlded_dis" />
+                    android:src="@drawable/play_icn_dlded_dis"
+                android:visibility="gone"/>
 
+                <!--0107 屏蔽下载按钮-->
                 <ImageView
                     android:id="@+id/playing_cmt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:src="@drawable/play_icn_cmt_number_dis" />
+                    android:src="@drawable/play_icn_cmt_number_dis"
+                android:visibility="gone"/>
 
+                <!--0107 屏蔽更多按钮-->
                 <ImageView
                     android:id="@+id/playing_more"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:src="@drawable/play_icn_more" />
+                    android:src="@drawable/play_icn_more"
+                android:visibility="gone"/>
             </LinearLayout>
 
             <LinearLayout

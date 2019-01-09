@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.joy.player.widgets.TintToolbar
+    <com.joy.player.widget.TintToolbar
         android:id="@+id/toolbar"
         android:fitsSystemWindows="true"
         android:layout_width="match_parent"
@@ -26,7 +26,8 @@
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@+id/bar_music"
                 android:background="@drawable/actionbar_disco"
-                android:clickable="true" />
+                android:clickable="true"
+                android:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/bar_music"
@@ -42,7 +43,8 @@
                 android:layout_height="match_parent"
                 android:layout_toRightOf="@+id/bar_music"
                 android:background="@drawable/actionbar_friends"
-                android:clickable="true" />
+                android:clickable="true"
+                android:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/bar_search"
@@ -53,9 +55,9 @@
                 android:layout_centerVertical="true"
                 android:background="@drawable/actionbar_search" />
         </RelativeLayout>
-    </com.joy.player.widgets.TintToolbar>
+    </com.joy.player.widget.TintToolbar>
 
-    <com.joy.player.CustomViewPager
+    <com.joy.player.widget.CustomViewPager
         android:layout_below="@+id/toolbar"
         android:layout_above="@+id/nav_play"
         android:id="@+id/main_viewpager"
