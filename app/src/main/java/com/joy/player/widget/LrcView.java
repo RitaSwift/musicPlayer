@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.Scroller;
 import com.joy.player.MainApplication;
+import com.joy.player.R;
 import com.joy.player.info.LrcRow;
 import com.joy.player.util.CommonUtils;
 
