@@ -8,12 +8,14 @@
         android:orderInCategory="1"
         android:title="search"
         app:showAsAction="ifRoom|collapseActionView" />
+
+   <!-- 0107 屏蔽排序icon-->
     <item
         android:id="@+id/action_more"
         android:icon="@drawable/actionbar_more"
         android:orderInCategory="1"
         android:title="search"
-        app:showAsAction="ifRoom|collapseActionView" />
+        app:showAsAction="ifRoom|collapseActionView"/>
 
 
     <!--<item-->

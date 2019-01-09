@@ -2,12 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+ <!--   0107 屏蔽本地音乐按什么排序-->
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/actionbar_more"
         android:orderInCategory="100"
         android:title="  "
-        app:showAsAction="always">
+        app:showAsAction="always"
+    android:visible="false">
         <menu>
             <item
                 android:id="@+id/menu_sort_by_az"
