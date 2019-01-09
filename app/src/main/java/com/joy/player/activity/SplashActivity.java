@@ -3,6 +3,7 @@ package com.joy.player.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import com.joy.player.R;
+import com.joy.player.proxy.utils.Constants;
 import com.joy.player.util.PermissionHelper;
 
 import net.youmi.android.AdManager;
@@ -96,7 +98,14 @@ public class SplashActivity extends Activity {
         //		// 设置是否展示失败自动跳转，默认自动跳转
         //		splashViewSettings.setAutoJumpToTargetWhenShowFailed(false);
         // 设置跳转的窗口类
-        splashViewSettings.setTargetClass(MainActivity.class);
+        SharedPreferences loginInfo = getSharedPreferences(Constants.SP_LOGININFO, Context.MODE_PRIVATE);
+        //如果登录了
+        if(loginInfo.getBoolean(Constants.SP_ISLOGINED,false)){
+            splashViewSettings.setTargetClass(MainActivity.class);
+        }
+        else{
+            splashViewSettings.setTargetClass(LoginActivity.class);
+        }
         // 设置开屏的容器
         splashViewSettings.setSplashViewContainer(splashLayout);
 

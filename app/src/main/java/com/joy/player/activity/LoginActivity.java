@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,12 +16,12 @@ import com.joy.player.R;
 import com.joy.player.handler.HandlerUtil;
 import com.joy.player.proxy.utils.Constants;
 import com.joy.player.widget.SplashScreen;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.squareup.okhttp.*;
+import net.youmi.android.normal.spot.SpotManager;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.HashMap;
 
 public class LoginActivity extends Activity {
     private static final String CURRENT_THEME = "LoginActivity";
@@ -33,6 +34,9 @@ public class LoginActivity extends Activity {
     private static final int REGISTER_SUCCESS = 1;
     private static final int LOGIN_FAIL = 2;
     private static final int LOGIN_SUCCESS = 3;
+    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");//mdiatype 这个需要和服务端保持一致
+    private static final MediaType MEDIA_TYPE_MARKDOWN = MediaType.parse("text/plain; charset=UTF-8");//mdiatype 这个需要和服务端保持一致
+    private static final String BASE_URL = "http://139.199.126.198:8888";//请求接口根地址
 
     private Handler requestHandler = new Handler() {
         @Override
@@ -84,6 +88,7 @@ public class LoginActivity extends Activity {
     private void toMainInter(){
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void saveUserInfo(){
@@ -109,17 +114,44 @@ public class LoginActivity extends Activity {
         });
     }
 
-    private void performLoginRequest(String username, String password) {
+    private void performLoginRequest(final String username, final String password) {
         Runnable requestTask = new Runnable() {
             @Override
             public void run() {
                 Message msg = requestHandler.obtainMessage();
                 try {
+//                    OkHttpClient client = new OkHttpClient();
+////                    String url = "139.199.126.198:8888/login?username="+username+"&password="+password;
+//                    String url = "http://www.baidu.com/";
+//                    Request request = new Request.Builder()
+//                            .url(url)
+//                            .build();
+//                    Call call = client.newCall(request);
+//                    // 1
+//                    Response response = call.execute();
+//
+//                    if (!response.isSuccessful()) {
+//                        msg.what = LOGIN_FAIL;
+//                    } else {
+//                        msg.what = LOGIN_SUCCESS;
+//                    }
                     OkHttpClient client = new OkHttpClient();
-
-                    Request request = new Request.Builder()
-                            .url("http://www.baidu.com")
-                            .build();
+                    HashMap<String, String> paramsMap = new HashMap<>();
+                    paramsMap.put("username",username);
+                    paramsMap.put("password",password);
+                    StringBuilder tempParams = new StringBuilder();
+                    int pos = 0;
+                    for (String key : paramsMap.keySet()) {
+                        if (pos > 0) {
+                            tempParams.append("&");
+                        }
+                        tempParams.append(String.format("%s=%s", key, URLEncoder.encode(paramsMap.get(key), "utf-8")));
+                        pos++;
+                    }
+                    String params = tempParams.toString();
+                    RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, params);
+                    String requestUrl = String.format("%s/%s", BASE_URL, "login");
+                    final Request request = addHeaders().url(requestUrl).post(body).build();
                     Call call = client.newCall(request);
                     // 1
                     Response response = call.execute();
@@ -127,11 +159,19 @@ public class LoginActivity extends Activity {
                     if (!response.isSuccessful()) {
                         msg.what = LOGIN_FAIL;
                     } else {
-                        msg.what = LOGIN_SUCCESS;
+                        String string = response.body().string();
+                        if("0".equals(string)){
+                            msg.what = LOGIN_SUCCESS;
+                        }
+                        else
+                        {
+                            msg.what = LOGIN_FAIL;
+                        }
                     }
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     msg.what = LOGIN_FAIL;
-                } finally {
+                }
+                finally {
                     msg.sendToTarget();
                 }
             }
@@ -141,17 +181,29 @@ public class LoginActivity extends Activity {
         requestThread.start();
     }
 
-    private void performRegisterRequest(String username, String password) {
+    private void performRegisterRequest(final String username, final String password) {
         Runnable requestTask = new Runnable() {
             @Override
             public void run() {
                 Message msg = requestHandler.obtainMessage();
                 try {
                     OkHttpClient client = new OkHttpClient();
-
-                    Request request = new Request.Builder()
-                            .url("http://www.baidu.com")
-                            .build();
+                    HashMap<String, String> paramsMap = new HashMap<>();
+                    paramsMap.put("username",username);
+                    paramsMap.put("password",password);
+                    StringBuilder tempParams = new StringBuilder();
+                    int pos = 0;
+                    for (String key : paramsMap.keySet()) {
+                        if (pos > 0) {
+                            tempParams.append("&");
+                        }
+                        tempParams.append(String.format("%s=%s", key, URLEncoder.encode(paramsMap.get(key), "utf-8")));
+                        pos++;
+                    }
+                    String params = tempParams.toString();
+                    RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, params);
+                    String requestUrl = String.format("%s/%s", BASE_URL, "register");
+                    final Request request = addHeaders().url(requestUrl).post(body).build();
                     Call call = client.newCall(request);
                     // 1
                     Response response = call.execute();
@@ -159,7 +211,14 @@ public class LoginActivity extends Activity {
                     if (!response.isSuccessful()) {
                         msg.what = REGISTER_FAIL;
                     } else {
-                        msg.what = REGISTER_SUCCESS;
+                        String string = response.body().string();
+                        if("0".equals(string)){
+                            msg.what = REGISTER_SUCCESS;
+                        }
+                        else
+                        {
+                            msg.what = REGISTER_FAIL;
+                        }
                     }
                 } catch (IOException ex) {
                     msg.what = REGISTER_FAIL;
@@ -171,5 +230,20 @@ public class LoginActivity extends Activity {
 
         Thread requestThread = new Thread(requestTask);
         requestThread.start();
+    }
+
+    private Request.Builder addHeaders() {
+        Request.Builder builder = new Request.Builder()
+                .addHeader("Connection", "keep-alive")
+                .addHeader("platform", "2")
+                .addHeader("phoneModel", Build.MODEL)
+                .addHeader("systemVersion", Build.VERSION.RELEASE)
+                .addHeader("appVersion", "1.0.0");
+        return builder;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
