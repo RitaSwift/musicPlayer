@@ -47,6 +47,14 @@
             </intent-filter>
         </activity>
         <activity
+                android:name=".activity.PlayingOnlineActivity"
+                android:launchMode="singleTask"
+                android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="com.joy.player.LAUNCH_NOW_PLAYING_ACTION" />
+            </intent-filter>
+        </activity>
+        <activity
                 android:name=".activity.LocalSearchActivity"
                 android:screenOrientation="portrait" />
         <activity
