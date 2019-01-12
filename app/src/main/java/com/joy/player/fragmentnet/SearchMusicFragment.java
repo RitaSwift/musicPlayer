@@ -1,14 +1,8 @@
 package com.joy.player.fragmentnet;
 
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,24 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.google.gson.JsonObject;
-import com.joy.player.MainApplication;
 import com.joy.player.R;
-import com.joy.player.activity.PlayingActivity;
 import com.joy.player.activity.PlayingOnlineActivity;
-import com.joy.player.downmusic.Down;
 import com.joy.player.fragment.AttachFragment;
-import com.joy.player.info.MusicInfo;
-import com.joy.player.json.MusicDetailInfo;
-import com.joy.player.json.SearchSongInfo;
 import com.joy.player.json.SearchSongInfo2;
-import com.joy.player.net.BMA;
-import com.joy.player.net.HttpUtil;
-import com.joy.player.service.MusicPlayer;
 import com.joy.player.widget.DividerItemDecoration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class SearchMusicFragment extends AttachFragment {
 
@@ -42,15 +25,6 @@ public class SearchMusicFragment extends AttachFragment {
     private ArrayList<SearchSongInfo2> songInfos;
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
-
-//
-//    public static SearchMusicFragment newInstance(ArrayList<SearchSongInfo> list) {
-//        SearchMusicFragment fragment = new SearchMusicFragment();
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelableArrayList("searchMusic", list);
-//        fragment.setArguments(bundle);
-//        return fragment;
-//    }
 
     public static SearchMusicFragment newInstance(ArrayList<SearchSongInfo2> list) {
         SearchMusicFragment fragment = new SearchMusicFragment();
