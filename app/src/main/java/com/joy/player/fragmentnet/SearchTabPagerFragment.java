@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import com.google.gson.JsonParser;
+import com.joy.player.json.SearchSongInfo2;
 import com.joy.player.util.ThemeUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -24,6 +26,10 @@ import com.joy.player.json.SearchArtistInfo;
 import com.joy.player.json.SearchSongInfo;
 import com.joy.player.net.BMA;
 import com.joy.player.net.HttpUtil;
+import com.squareup.okhttp.Call;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +44,8 @@ public class SearchTabPagerFragment extends AttachFragment {
     private List searchResults = Collections.emptyList();
     FrameLayout frameLayout;
     View contentView;
-    ArrayList<SearchSongInfo> songResults = new ArrayList<>();
+//    ArrayList<SearchSongInfo> songResults = new ArrayList<>();
+    ArrayList<SearchSongInfo2> songResults = new ArrayList<>();
     ArrayList<SearchArtistInfo> artistResults = new ArrayList<>();
     ArrayList<SearchAlbumInfo> albumResults = new ArrayList<>();
 
@@ -58,29 +65,48 @@ public class SearchTabPagerFragment extends AttachFragment {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
+                                        OkHttpClient client = new OkHttpClient();
+                    String url = "http://47.100.245.211:8888/search?keyword="+key;
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .build();
+                    Call call = client.newCall(request);
+                    // 1
+                    Response response = call.execute();
 
-                    JsonObject jsonObject = HttpUtil.getResposeJsonObject(BMA.Search.searchMerge(key, 1, 10)).get("result").getAsJsonObject();
-                    JsonObject songObject = jsonObject.get("song_info").getAsJsonObject();
-                    JsonArray songArray = songObject.get("song_list").getAsJsonArray();
-                    for (JsonElement o : songArray) {
-                        SearchSongInfo songInfo = MainApplication.gsonInstance().fromJson(o, SearchSongInfo.class);
-                        Log.e("songinfo", songInfo.getTitle());
-                        songResults.add(songInfo);
+                    if (response.isSuccessful()) {
+                        String string = response.body().string();
+                        JsonParser parser = new JsonParser();
+                        JsonElement el = parser.parse(string);
+                        JsonArray array =  el.getAsJsonArray();
+                        for (JsonElement o : array) {
+                            SearchSongInfo2 songInfo = MainApplication.gsonInstance().fromJson(o, SearchSongInfo2.class);
+//                        Log.e("songinfo", songInfo.get());
+                            songResults.add(songInfo);
+                        }
                     }
 
-                    JsonObject artistObject = jsonObject.get("artist_info").getAsJsonObject();
-                    JsonArray artistArray = artistObject.get("artist_list").getAsJsonArray();
-                    for (JsonElement o : artistArray) {
-                        SearchArtistInfo artistInfo = MainApplication.gsonInstance().fromJson(o, SearchArtistInfo.class);
-                        artistResults.add(artistInfo);
-                    }
+//                    JsonObject jsonObject = HttpUtil.getResposeJsonObject(BMA.Search.searchMerge(key, 1, 10)).getAsJsonObject();
+//                    JsonArray songArray = jsonObject.get("song").getAsJsonArray();
+//                    for (JsonElement o : songArray) {
+//                        SearchSongInfo2 songInfo = MainApplication.gsonInstance().fromJson(o, SearchSongInfo2.class);
+////                        Log.e("songinfo", songInfo.get());
+//                        songResults.add(songInfo);
+//                    }
 
-                    JsonObject albumObject = jsonObject.get("album_info").getAsJsonObject();
-                    JsonArray albumArray = albumObject.get("album_list").getAsJsonArray();
-                    for (JsonElement o : albumArray) {
-                        SearchAlbumInfo albumInfo = MainApplication.gsonInstance().fromJson(o, SearchAlbumInfo.class);
-                        albumResults.add(albumInfo);
-                    }
+//                    JsonObject artistObject = jsonObject.get("artist_info").getAsJsonObject();
+//                    JsonArray artistArray = artistObject.get("artist_list").getAsJsonArray();
+//                    for (JsonElement o : artistArray) {
+//                        SearchArtistInfo artistInfo = MainApplication.gsonInstance().fromJson(o, SearchArtistInfo.class);
+//                        artistResults.add(artistInfo);
+//                    }
+//
+//                    JsonObject albumObject = jsonObject.get("album_info").getAsJsonObject();
+//                    JsonArray albumArray = albumObject.get("album_list").getAsJsonArray();
+//                    for (JsonElement o : albumArray) {
+//                        SearchAlbumInfo albumInfo = MainApplication.gsonInstance().fromJson(o, SearchAlbumInfo.class);
+//                        albumResults.add(albumInfo);
+//                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

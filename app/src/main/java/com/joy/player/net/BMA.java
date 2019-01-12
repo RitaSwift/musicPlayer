@@ -634,8 +634,10 @@ public class BMA {
          * @return
          */
         public static String searchMerge(String query, int pageNo, int pageSize) {
+//            webapp_music
+            //示例：http://tingapi.ting.baidu.com/v1/restserver/ting?from=android&version=5.6.5.6&format=json&calback=&method=baidu.ting.search.catalogSug&query=海阔天空&page_no=1&page_size=10&type=-1&data_source=0
             StringBuffer sb = new StringBuffer(BASE);
-            sb.append("&method=").append("baidu.ting.search.merge")
+            sb.append("&method=").append("baidu.ting.search.catalogSug")
                     .append("&query=").append(encode(query))
                     .append("&page_no=").append(pageNo)
                     .append("&page_size=").append(pageSize)

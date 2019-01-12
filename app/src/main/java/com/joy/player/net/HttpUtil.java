@@ -250,6 +250,10 @@ public class HttpUtil {
                     .url(action1)
 //                    .addHeader("Referer","http://music.163.com/")
 //                    .addHeader("Cookie", "appver=1.5.0.75771")
+                    .addHeader("User-Agent","Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Mobile Safari/537.36")
+                    .addHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+                    .addHeader("Accept-Encoding","gzip, deflate")
+                    .addHeader("Accept-Language","zh-CN,zh;q=0.9")
                     .build();
             Response response = mOkHttpClient.newCall(request).execute();
             if (response.isSuccessful()) {
@@ -260,7 +264,9 @@ public class HttpUtil {
                 JsonParser parser = new JsonParser();
                 JsonElement el = parser.parse(c);
                 return el.getAsJsonObject();
-
+            }
+            else{
+                response.body().close();
             }
 
         } catch (Exception e) {

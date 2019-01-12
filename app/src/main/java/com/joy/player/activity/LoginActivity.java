@@ -36,7 +36,7 @@ public class LoginActivity extends Activity {
     private static final int LOGIN_SUCCESS = 3;
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");//mdiatype 这个需要和服务端保持一致
     private static final MediaType MEDIA_TYPE_MARKDOWN = MediaType.parse("text/plain; charset=UTF-8");//mdiatype 这个需要和服务端保持一致
-    private static final String BASE_URL = "http://139.199.126.198:8888";//请求接口根地址
+    private static final String BASE_URL = "http://47.100.245.211:8888";//请求接口根地址
 
     private Handler requestHandler = new Handler() {
         @Override

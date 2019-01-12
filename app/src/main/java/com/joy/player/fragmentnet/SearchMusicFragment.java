@@ -1,10 +1,14 @@
 package com.joy.player.fragmentnet;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,11 +19,14 @@ import android.widget.TextView;
 import com.google.gson.JsonObject;
 import com.joy.player.MainApplication;
 import com.joy.player.R;
+import com.joy.player.activity.PlayingActivity;
+import com.joy.player.activity.PlayingOnlineActivity;
 import com.joy.player.downmusic.Down;
 import com.joy.player.fragment.AttachFragment;
 import com.joy.player.info.MusicInfo;
 import com.joy.player.json.MusicDetailInfo;
 import com.joy.player.json.SearchSongInfo;
+import com.joy.player.json.SearchSongInfo2;
 import com.joy.player.net.BMA;
 import com.joy.player.net.HttpUtil;
 import com.joy.player.service.MusicPlayer;
@@ -31,12 +38,21 @@ import java.util.HashMap;
 public class SearchMusicFragment extends AttachFragment {
 
     private MusicAdapter mAdapter;
-    private ArrayList<SearchSongInfo> songInfos;
+    //    private ArrayList<SearchSongInfo> songInfos;
+    private ArrayList<SearchSongInfo2> songInfos;
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
 
+//
+//    public static SearchMusicFragment newInstance(ArrayList<SearchSongInfo> list) {
+//        SearchMusicFragment fragment = new SearchMusicFragment();
+//        Bundle bundle = new Bundle();
+//        bundle.putParcelableArrayList("searchMusic", list);
+//        fragment.setArguments(bundle);
+//        return fragment;
+//    }
 
-    public static SearchMusicFragment newInstance(ArrayList<SearchSongInfo> list) {
+    public static SearchMusicFragment newInstance(ArrayList<SearchSongInfo2> list) {
         SearchMusicFragment fragment = new SearchMusicFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList("searchMusic", list);
@@ -68,9 +84,15 @@ public class SearchMusicFragment extends AttachFragment {
 
         final static int FIRST_ITEM = 0;
         final static int ITEM = 1;
-        private ArrayList<SearchSongInfo> mList;
+        private ArrayList<SearchSongInfo2> mList;
 
-        public MusicAdapter(ArrayList<SearchSongInfo> list) {
+        //        public MusicAdapter(ArrayList<SearchSongInfo> list) {
+//////            if (list == null) {
+//////                throw new IllegalArgumentException("model Data must not be null");
+//////            }
+////            mList = list;
+////        }
+        public MusicAdapter(ArrayList<SearchSongInfo2> list) {
 //            if (list == null) {
 //                throw new IllegalArgumentException("model Data must not be null");
 //            }
@@ -78,7 +100,7 @@ public class SearchMusicFragment extends AttachFragment {
         }
 
         //更新adpter的数据
-        public void updateDataSet(ArrayList<SearchSongInfo> list) {
+        public void updateDataSet(ArrayList<SearchSongInfo2> list) {
             this.mList = list;
         }
 
@@ -100,11 +122,11 @@ public class SearchMusicFragment extends AttachFragment {
         //将数据与界面进行绑定
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            SearchSongInfo model = mList.get(position);
+            SearchSongInfo2 model = mList.get(position);
             if (holder instanceof ListItemViewHolder) {
 
-                ((ListItemViewHolder) holder).mainTitle.setText(model.getTitle());
-                ((ListItemViewHolder) holder).title.setText(model.getAuthor());
+                ((ListItemViewHolder) holder).mainTitle.setText(model.getName());
+                ((ListItemViewHolder) holder).title.setText(model.getArtist());
 
             }
         }
@@ -149,60 +171,65 @@ public class SearchMusicFragment extends AttachFragment {
                 moreOverflow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final SearchSongInfo model = mList.get(getAdapterPosition());
-                        new AlertDialog.Builder(mContext).setTitle("要下载音乐吗").
-                                setPositiveButton(mContext.getString(R.string.sure), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Down.downMusic(MainApplication.context, model.getSong_id() + "", model.getTitle(), model.getAuthor());
-                                        dialog.dismiss();
-                                    }
-                                }).
-                                setNegativeButton(mContext.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }).show();
+                        //0107 屏蔽下载音乐的功能
+//                        final SearchSongInfo2 model = mList.get(getAdapterPosition());
+//                        new AlertDialog.Builder(mContext).setTitle("要下载音乐吗").
+//                                setPositiveButton(mContext.getString(R.string.sure), new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        Down.downMusic(MainApplication.context, model.getSongid() + "", model.getSongname(), model.getArtistname());
+//                                        dialog.dismiss();
+//                                    }
+//                                }).
+//                                setNegativeButton(mContext.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        dialog.dismiss();
+//                                    }
+//                                }).show();
                     }
                 });
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final SearchSongInfo model = mList.get(getAdapterPosition());
-                        new AsyncTask<Void, Void, Void>(){
+                        final SearchSongInfo2 model = mList.get(getAdapterPosition());
+                        Intent intent = new Intent(getActivity(), PlayingOnlineActivity.class);
+                        intent.putExtra("musicinfo",model);
+                        startActivity(intent);
 
-                            @Override
-                            protected Void doInBackground(Void... params) {
-                                MusicInfo musicInfo = new MusicInfo();
-                                try {
-                                    MusicDetailInfo info = null;
-                                    JsonObject jsonObject = HttpUtil.getResposeJsonObject(BMA.Song.songBaseInfo(model.getSong_id()))
-                                            .get("result").getAsJsonObject().get("items").getAsJsonArray().get(0).getAsJsonObject();
-                                    info = MainApplication.gsonInstance().fromJson(jsonObject, MusicDetailInfo.class);
-                                    musicInfo.albumData = info.getPic_small();
-                                } catch (NullPointerException e) {
-                                    e.printStackTrace();
-                                }
-
-
-                                musicInfo.songId = Integer.parseInt(model.getSong_id());
-                                musicInfo.musicName = model.getTitle();
-                                musicInfo.artist = model.getAuthor();
-                                musicInfo.islocal = false;
-                                musicInfo.albumName = model.getAlbum_title();
-                                musicInfo.albumId = Integer.parseInt(model.getAlbum_id());
-                                musicInfo.artistId = Integer.parseInt(model.getArtist_id());
-                                musicInfo.lrc = model.getLrclink();
-
-                                HashMap<Long, MusicInfo> infos = new HashMap<Long, MusicInfo>();
-                                long[] list = new long[1];
-                                list[0] = musicInfo.songId;
-                                infos.put(list[0], musicInfo);
-                                MusicPlayer.playAll(infos, list, 0, false);
-                                return null;
-                            }
-                        }.execute();
+//                        new AsyncTask<Void, Void, Void>() {
+//
+//                            @Override
+//                            protected Void doInBackground(Void... params) {
+//                                MusicInfo musicInfo = new MusicInfo();
+//                                MusicDetailInfo info = null;
+//                                try {
+//                                    JsonObject jsonObject = HttpUtil.getResposeJsonObject(BMA.Song.songBaseInfo(model.getId()))
+//                                            .get("result").getAsJsonObject().get("items").getAsJsonArray().get(0).getAsJsonObject();
+//                                    info = MainApplication.gsonInstance().fromJson(jsonObject, MusicDetailInfo.class);
+//                                    musicInfo.albumData = info.getPic_small();
+//                                } catch (NullPointerException e) {
+//                                    e.printStackTrace();
+//                                }
+//
+//
+//                                musicInfo.songId = Integer.parseInt(info.getSong_id());
+//                                musicInfo.musicName = info.getSong_title();
+//                                musicInfo.artist = info.getArtist_name();
+//                                musicInfo.islocal = false;
+//                                musicInfo.albumName = info.getAlbum_title();
+//                                musicInfo.albumId = Integer.parseInt(info.getAlbum_id());
+//                                musicInfo.artistId = Integer.parseInt(info.getArtist_id());
+//                                musicInfo.lrc = info.getLrclink();
+//
+//                                HashMap<Long, MusicInfo> infos = new HashMap<Long, MusicInfo>();
+//                                long[] list = new long[1];
+//                                list[0] = musicInfo.songId;
+//                                infos.put(list[0], musicInfo);
+//                                MusicPlayer.playAll(infos, list, 0, false);
+//                                return null;
+//                            }
+//                        }.execute();
                     }
                 });
 
