@@ -58,6 +58,7 @@ import static com.joy.player.service.MusicPlayer.getAlbumPath;
 
 
 /**
+ *
  */
 public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     private ImageView mBackAlbum, mPlayingmode, mControl, mNext, mPre, mPlaylist, mCmt, mFav, mDown, mMore, mNeedle;
@@ -94,9 +95,10 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     private PlayMusic mPlayThread;
     private boolean print = true;
     private String TAG = PlayingOnlineActivity.class.getSimpleName();
-    private SearchSongInfo2 model;
 
+    private SearchSongInfo2 model;
     private Player player;
+
 
     @Override
     protected void showQuickControl(boolean show) {
@@ -106,11 +108,12 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        model = getIntent().getParcelableExtra("musicinfo");
         setContentView(R.layout.activity_playing);
         //播放管理界面
         mPlaylistsManager = PlaylistsManager.getInstance(this);
+        model = getIntent().getParcelableExtra("musicinfo");
 
+        //放歌曲名字和作者界面
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -125,8 +128,6 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
             });
         }
 
-
-
         mAlbumLayout = (FrameLayout) findViewById(R.id.headerView);
         mLrcViewContainer = (RelativeLayout) findViewById(R.id.lrcviewContainer);
         mLrcView = (LrcView) findViewById(R.id.lrcview);
@@ -134,18 +135,16 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         mMusicTool = (LinearLayout) findViewById(R.id.music_tool);
 
         mBackAlbum = (ImageView) findViewById(R.id.albumArt);
-        //播放模式 单曲循坏啥的
         mPlayingmode = (ImageView) findViewById(R.id.playing_mode);
+        //播放按钮
         mControl = (ImageView) findViewById(R.id.playing_play);
         mNext = (ImageView) findViewById(R.id.playing_next);
         mPre = (ImageView) findViewById(R.id.playing_pre);
         mPlaylist = (ImageView) findViewById(R.id.playing_playlist);
         mMore = (ImageView) findViewById(R.id.playing_more);
-        //下载按钮
         mCmt = (ImageView) findViewById(R.id.playing_cmt);
         mFav = (ImageView) findViewById(R.id.playing_fav);
         mDown = (ImageView) findViewById(R.id.playing_down);
-        //实时已经播放的时间
         mTimePlayed = (TextView) findViewById(R.id.music_duration_played);
         mDuration = (TextView) findViewById(R.id.music_duration);
         mProgress = (PlayerSeekBar) findViewById(R.id.play_seek);
@@ -169,16 +168,31 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
                 player.playUrl(model.getUrl());
             }
         }).start();
+
+        ab.setTitle(model.getName());
+        ab.setSubtitle(model.getArtist());
+        mDuration.setText(MusicUtils.makeShortTimeString(PlayingOnlineActivity.this.getApplication(), Long.parseLong(model.getDuration())));
+
+
         loadOther();
         setViewPager();
         initLrcView();
         mHandler = HandlerUtil.getInstance(this);
 
-        mHandler.postDelayed(mUpAlbumRunnable, 0);
         mPlayThread = new PlayMusic();
         mPlayThread.start();
 
+        initView();
 
+    }
+
+    private void initView() {
+
+
+
+        if (player.mediaPlayer.isPlaying()) {
+            mControl.setImageResource(R.drawable.play_rdi_btn_pause);
+        }
     }
 
     private void initLrcView() {
@@ -255,38 +269,9 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
         @Override
         public void onSeekTo(int progress) {
-//            MusicPlayer.seek(progress);
         }
     };
 
-
-    private List<LrcRow> getLrcRows() {
-
-        List<LrcRow> rows = null;
-        InputStream is = null;
-        try {
-            is = new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath() +
-                    "/remusic/lrc/" + MusicPlayer.getCurrentAudioId());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            if (is == null) {
-                return null;
-            }
-        }
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try {
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            rows = DefaultLrcParser.getIstance().getLrcRows(sb.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return rows;
-    }
 
     private void loadOther() {
 
@@ -335,40 +320,22 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
                     if (!isNextOrPreSetPage) {
                         if (pPosition < MusicPlayer.getQueuePosition() + 1) {
-//                            HandlerUtil.getInstance(PlayingOnlineActivity.this).postDelayed(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                  //  MusicPlayer.previous(PlayingOnlineActivity.this, true);
-//                                    Message msg = new Message();
-//                                    msg.what = 0;
-//                                    mPlayHandler.sendMessage(msg);
-//                                }
-//                            }, 500);
 
                             Message msg = new Message();
                             msg.what = PRE_MUSIC;
-                            mPlayHandler.sendMessageDelayed(msg,TIME_DELAY);
+                            mPlayHandler.sendMessageDelayed(msg, TIME_DELAY);
 
 
                         } else if (pPosition > MusicPlayer.getQueuePosition() + 1) {
-//                            HandlerUtil.getInstance(PlayingOnlineActivity.this).postDelayed(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                  //  MusicPlayer.mNext();
-//
-//
-//                                }
-//                            }, 500);
 
                             Message msg = new Message();
                             msg.what = NEXT_MUSIC;
-                            mPlayHandler.sendMessageDelayed(msg,TIME_DELAY);
+                            mPlayHandler.sendMessageDelayed(msg, TIME_DELAY);
 
                         }
                     }
 
                 }
-                //MusicPlayer.setQueuePosition(pPosition - 1);
                 isNextOrPreSetPage = false;
 
             }
@@ -396,8 +363,6 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         mPre.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // MusicPlayer.previous(PlayingOnlineActivity.this.getApplication(), true);
-
                 Message msg = new Message();
                 msg.what = PRE_MUSIC;
                 mPlayHandler.sendMessage(msg);
@@ -408,13 +373,27 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
             @Override
             public void onClick(View v) {
 
-                if (MusicPlayer.isPlaying()) {
-                    mControl.setImageResource(R.drawable.play_rdi_btn_pause);
-                } else {
+                if (player.mediaPlayer.isPlaying()) {
                     mControl.setImageResource(R.drawable.play_rdi_btn_play);
-                }
-                if (MusicPlayer.getQueueSize() != 0) {
-                    MusicPlayer.playOrPause();
+                    player.mediaPlayer.pause();
+                    mProgress.removeCallbacks(mUpdateProgress);
+                    mControl.setImageResource(R.drawable.play_rdi_btn_play);
+                    if (mNeedleAnim != null) {
+                        mNeedleAnim.reverse();
+                        mNeedleAnim.end();
+                    }
+
+                    if (mRotateAnim != null && mRotateAnim.isRunning()) {
+                        mRotateAnim.cancel();
+                        float valueAvatar = (float) mRotateAnim.getAnimatedValue();
+                        mRotateAnim.setFloatValues(valueAvatar, 360f + valueAvatar);
+                    }
+                } else {
+                    mControl.setImageResource(R.drawable.play_rdi_btn_pause);
+                    player.mediaPlayer.start();
+                    if(mAnimatorSet != null){
+                        mAnimatorSet.start();
+                    }
                 }
             }
         });
@@ -426,13 +405,10 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
                     mRotateAnim.end();
                     mRotateAnim = null;
                 }
-//                mHandler.removeCallbacks(mNextRunnable);
-//                mHandler.postDelayed(mNextRunnable,300);
                 Message msg = new Message();
                 msg.what = NEXT_MUSIC;
                 mPlayHandler.sendMessage(msg);
 
-                //   MusicPlayer.mNext();
             }
         });
 
@@ -482,13 +458,6 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
     }
 
-    Runnable mNextRunnable = new Runnable() {
-        @Override
-        public void run() {
-            MusicPlayer.next();
-        }
-    };
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle item selection
@@ -506,7 +475,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        //分享功能屏蔽掉
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.playing_menu, menu);
         return true;
@@ -538,6 +507,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     @Override
     protected void onStart() {
         super.onStart();
+
         //设置ViewPager的默认项
         mViewPager.setCurrentItem(MusicPlayer.getQueuePosition() + 1);
     }
@@ -546,12 +516,12 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     public void onResume() {
         super.onResume();
         lastAlbum = -1;
-        if(MusicPlayer.isTrackLocal())
+        if (MusicPlayer.isTrackLocal())
             updateBuffer(100);
         else {
             updateBuffer(MusicPlayer.secondPosition());
         }
-        mHandler.postDelayed(mUpdateProgress,0);
+        mHandler.postDelayed(mUpdateProgress, 0);
     }
 
 
@@ -574,47 +544,10 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     }
 
     public void updateLrc() {
-//        List<LrcRow> list = getLrcRows();
-//        if (list != null && list.size() > 0) {
-//            mTryGetLrc.setVisibility(View.INVISIBLE);
-//            mLrcView.setLrcRows(list);
-//        } else {
-//            mTryGetLrc.setVisibility(View.VISIBLE);
-//            mLrcView.reset();
-//        }
     }
 
     public void updateTrack() {
-        mHandler.removeCallbacks(mUpAlbumRunnable);
-//        if(MusicPlayer.getCurrentAlbumId() != lastAlbum)
-//            mHandler.postDelayed(mUpAlbumRunnable, 1600);
-
-
-        isFav = false;
-        long[] favlists = mPlaylistsManager.getPlaylistIds(IConstants.FAV_PLAYLIST);
-//        long currentid = MusicPlayer.getCurrentAudioId();
-//        for (long i : favlists) {
-//            if (currentid == i) {
-//                isFav = true;
-//                break;
-//            }
-//        }
-        updateFav(isFav);
-        updateLrc();
-
-
-        ab.setTitle(model.getName());
-        ab.setSubtitle(model.getArtist());
-        //设置时间总长
-        mDuration.setText(MusicUtils.makeShortTimeString(PlayingOnlineActivity.this.getApplication(), Long.parseLong(model.getDuration())));
     }
-
-    private Runnable mUpAlbumRunnable = new Runnable() {
-        @Override
-        public void run() {
-            new setBlurredAlbumArt().execute();
-        }
-    };
 
     public void updateTrackInfo() {
 
@@ -635,18 +568,11 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         }
 
         if (mActiveView != null) {
-            //            animatorWeakReference = new WeakReference<>((ObjectAnimator) mActiveView.getTag(R.id.tag_animator));
-            //            mRotateAnim = animatorWeakReference.get();
             mRotateAnim = (ObjectAnimator) mActiveView.getTag(R.id.tag_animator);
         }
 
-//        mProgress.setMax((int) MusicPlayer.mDuration());
-
-
-
         mAnimatorSet = new AnimatorSet();
-//        if (MusicPlayer.isPlaying()) {
-        if (player.mediaPlayer.isPlaying()) {
+//        if (player.mediaPlayer.isPlaying()) {
             mProgress.removeCallbacks(mUpdateProgress);
             mProgress.postDelayed(mUpdateProgress, 200);
             mControl.setImageResource(R.drawable.play_rdi_btn_pause);
@@ -662,32 +588,33 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
                 mAnimatorSet.start();
             }
 
-        } else {
-            mProgress.removeCallbacks(mUpdateProgress);
-            mControl.setImageResource(R.drawable.play_rdi_btn_play);
-            if (mNeedleAnim != null) {
-                mNeedleAnim.reverse();
-                mNeedleAnim.end();
-            }
-
-            if (mRotateAnim != null && mRotateAnim.isRunning()) {
-                mRotateAnim.cancel();
-                float valueAvatar = (float) mRotateAnim.getAnimatedValue();
-                mRotateAnim.setFloatValues(valueAvatar, 360f + valueAvatar);
-            }
-        }
+//        }
+//        else {
+//            mProgress.removeCallbacks(mUpdateProgress);
+//            mControl.setImageResource(R.drawable.play_rdi_btn_play);
+//            if (mNeedleAnim != null) {
+//                mNeedleAnim.reverse();
+//                mNeedleAnim.end();
+//            }
+//
+//            if (mRotateAnim != null && mRotateAnim.isRunning()) {
+//                mRotateAnim.cancel();
+//                float valueAvatar = (float) mRotateAnim.getAnimatedValue();
+//                mRotateAnim.setFloatValues(valueAvatar, 360f + valueAvatar);
+//            }
+//        }
 
         isNextOrPreSetPage = false;
-//        if (MusicPlayer.getQueuePosition() + 1 != mViewPager.getCurrentItem()) {
-//            mViewPager.setCurrentItem(MusicPlayer.getQueuePosition() + 1);
-//            isNextOrPreSetPage = true;
-//        }
+        if (MusicPlayer.getQueuePosition() + 1 != mViewPager.getCurrentItem()) {
+            mViewPager.setCurrentItem(MusicPlayer.getQueuePosition() + 1);
+            isNextOrPreSetPage = true;
+        }
 
     }
 
     @Override
     public void updateBuffer(int p) {
-        mProgress.setSecondaryProgress(p*10);
+        mProgress.setSecondaryProgress(p * 10);
     }
 
     @Override
@@ -695,27 +622,22 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         mProgress.setLoading(l);
     }
 
-    //更新进度条秒数 还有一个不知道
     private Runnable mUpdateProgress = new Runnable() {
 
         @Override
         public void run() {
 
-            //更新进度条
             if (mProgress != null) {
-//                long position = MusicPlayer.position();
-//                long duration = MusicPlayer.duration();
                 long position = player.mediaPlayer.getCurrentPosition();
-                long duration = Long.parseLong(model.getDuration() )* 1000;
-                if (duration > 0 && duration < 627080716){
+                long duration = Long.parseLong(model.getDuration()) * 1000;
+                if (duration > 0 && duration < 627080716) {
                     mProgress.setProgress((int) (1000 * position / duration));
-                    mTimePlayed.setText(MusicUtils.makeTimeString( position ));
+                    mTimePlayed.setText(MusicUtils.makeTimeString(position));
                 }
 
-//                if (MusicPlayer.isPlaying()) {
-                if (player.mediaPlayer.isPlaying()) {
+                if (MusicPlayer.isPlaying()) {
                     mProgress.postDelayed(mUpdateProgress, 200);
-                }else {
+                } else {
                     mProgress.removeCallbacks(mUpdateProgress);
                 }
             }
@@ -730,14 +652,11 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-//                    i = (int) (i * MusicPlayer.duration() / 1000);
-                    i = (int) (i * player.mediaPlayer.getDuration() / 1000);
-                    mLrcView.seekTo(i, true, b);
-                    if (b) {
-//                        MusicPlayer.seek((long)i);
-                        player.mediaPlayer.seekTo(i);
-                        mTimePlayed.setText(MusicUtils.makeTimeString( i ));
-                    }
+                    this.progress = progress * player.mediaPlayer.getDuration()
+                            / seekBar.getMax();
+                    //设置流动时间 这个地方每一次运行就开始有反应
+                    mTimePlayed.setText(MusicUtils.makeTimeString( player.mediaPlayer.getCurrentPosition()));
+//                    mTimePlayed.setText(MusicUtils.makeTimeString( System.currentTimeMillis() ));
                 }
 
                 @Override
@@ -746,6 +665,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
+                    player.mediaPlayer.seekTo(progress);
                 }
             });
     }
@@ -803,8 +723,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         public void transformPage(View view, float position) {
 
             if (position == 0) {
-//                if (MusicPlayer.isPlaying()) {
-                if (player.mediaPlayer.isPlaying()) {
+                if (MusicPlayer.isPlaying()) {
                     mRotateAnim = (ObjectAnimator) view.getTag(R.id.tag_animator);
                     if (mRotateAnim != null && !mRotateAnim.isRunning() && mNeedleAnim != null) {
                         mAnimatorSet = new AnimatorSet();
@@ -841,107 +760,6 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     }
 
 
-    private class setBlurredAlbumArt extends AsyncTask<Void, Void, Drawable> {
-
-        long albumid = MusicPlayer.getCurrentAlbumId();
-
-        @Override
-        protected Drawable doInBackground(Void... loadedImage) {
-            lastAlbum = albumid;
-            Drawable drawable = null;
-            mBitmap = null;
-            if (mNewOpts == null) {
-                mNewOpts = new BitmapFactory.Options();
-                mNewOpts.inSampleSize = 6;
-                mNewOpts.inPreferredConfig = Bitmap.Config.RGB_565;
-            }
-            if (!MusicPlayer.isTrackLocal()) {
-                L.D(print, TAG, "music is net");
-                if (getAlbumPath() == null) {
-                    L.D(print, TAG, "getalbumpath is null");
-                    mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_disk_210);
-                    drawable = ImageUtils.createBlurredImageFromBitmap(mBitmap, PlayingOnlineActivity.this.getApplication(), 3);
-                    return drawable;
-                }
-                ImageRequest imageRequest = ImageRequestBuilder
-                        .newBuilderWithSource(Uri.parse(getAlbumPath()))
-                        .setProgressiveRenderingEnabled(true)
-                        .build();
-
-                ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                DataSource<CloseableReference<CloseableImage>>
-                        dataSource = imagePipeline.fetchDecodedImage(imageRequest, PlayingOnlineActivity.this);
-
-                dataSource.subscribe(new BaseBitmapDataSubscriber() {
-                                         @Override
-                                         public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                                             // You can use the bitmap in only limited ways
-                                             // No need to do any cleanup.
-                                             if (bitmap != null) {
-                                                 mBitmap = bitmap;
-                                                 L.D(print, TAG, "getalbumpath bitmap success");
-                                             }
-                                         }
-
-                                         @Override
-                                         public void onFailureImpl(DataSource dataSource) {
-                                             // No cleanup required here.
-                                             L.D(print, TAG, "getalbumpath bitmap failed");
-                                             mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_disk_210);
-
-                                         }
-                                     },
-                        CallerThreadExecutor.getInstance());
-                if (mBitmap != null) {
-                    drawable = ImageUtils.createBlurredImageFromBitmap(mBitmap, PlayingOnlineActivity.this.getApplication(), 3);
-                }
-
-            } else {
-                try {
-                    mBitmap = null;
-                    Bitmap bitmap = null;
-                    Uri art = Uri.parse(getAlbumPath());
-                    L.D(print, TAG, "album is local ");
-                    if (art != null) {
-                        ParcelFileDescriptor fd = null;
-                        try {
-                            fd = getContentResolver().openFileDescriptor(art, "r");
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        if (fd != null) {
-                            bitmap = BitmapFactory.decodeFileDescriptor(fd.getFileDescriptor(), null, mNewOpts);
-                        } else {
-                            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_disk_210, mNewOpts);
-                        }
-                    } else {
-                        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_disk_210, mNewOpts);
-                    }
-                    if (bitmap != null) {
-                        drawable = ImageUtils.createBlurredImageFromBitmap(bitmap, PlayingOnlineActivity.this.getApplication(), 3);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            return drawable;
-        }
-
-        @Override
-        protected void onPostExecute(Drawable result) {
-
-            if (albumid != MusicPlayer.getCurrentAlbumId()) {
-                this.cancel(true);
-                return;
-            }
-            setDrawable(result);
-
-        }
-
-    }
-
     private void setDrawable(Drawable result) {
         if (result != null) {
             if (mBackAlbum.getDrawable() != null) {
@@ -970,18 +788,14 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
         @Override
         public Fragment getItem(int position) {
-
-            if (position == MusicPlayer.getQueue().length + 1 || position == 0) {
-                return RoundFragment.newInstance("");
-            }
-            // return RoundFragment.newInstance(MusicPlayer.getQueue()[position - 1]);
-            return RoundFragment.newInstance(MusicPlayer.getAlbumPathAll()[position - 1]);
+            //默认的圆封面
+            return RoundFragment.newInstance("");
         }
 
         @Override
         public int getCount() {
             //左右各加一个
-            return MusicPlayer.getQueue().length + 2;
+            return 1;
         }
 
 
@@ -1028,52 +842,23 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         }
     }
 
-
-//    private Thread mPlayThread = new Thread(new Runnable() {
-//        @Override
-//        public void run() {
-//            Looper.prepare();
-//            mPlayHandler = new Handler(){
-//                @Override
-//                public void handleMessage(Message msg) {
-//                    super.handleMessage(msg);
-//                    switch (msg.what){
-//                        case PRE_MUSIC:
-//                            MusicPlayer.previous(PlayingOnlineActivity.this,true);
-//                            break;
-//                        case NEXT_MUSIC:
-//                            MusicPlayer.next();
-//                            break;
-//                        case 3:
-//                            MusicPlayer.setQueuePosition(msg.arg1);
-//                            break;
-//                    }
-//
-//
-//                }
-//            };
-//
-//            Looper.loop();
-//        }
-//    });
-
     public class PlayMusic extends Thread {
-        public void run(){
-            if(Looper.myLooper() == null)
+        public void run() {
+            if (Looper.myLooper() == null)
                 Looper.prepare();
-            mPlayHandler = new Handler(){
+            mPlayHandler = new Handler() {
                 @Override
                 public void handleMessage(Message msg) {
                     super.handleMessage(msg);
-                    switch (msg.what){
+                    switch (msg.what) {
                         case PRE_MUSIC:
-                            MusicPlayer.previous(PlayingOnlineActivity.this,true);
+//                            MusicPlayer.previous(PlayingOnlineActivity.this,true);
                             break;
                         case NEXT_MUSIC:
-                            MusicPlayer.next();
+//                            MusicPlayer.next();
                             break;
                         case 3:
-                            MusicPlayer.setQueuePosition(msg.arg1);
+//                            MusicPlayer.setQueuePosition(msg.arg1);
                             break;
                     }
                 }

@@ -274,7 +274,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:src="@drawable/play_rdi_btn_play" />
+                    android:src="@drawable/play_rdi_btn_pause" />
 
                 <ImageView
                     android:id="@+id/playing_next"
