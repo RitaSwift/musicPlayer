@@ -108,7 +108,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_playing);
+        setContentView(R.layout.activity_playingonline);
         //播放管理界面
         mPlaylistsManager = PlaylistsManager.getInstance(this);
         model = getIntent().getParcelableExtra("musicinfo");
@@ -187,7 +187,6 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     }
 
     private void initView() {
-
 
 
         if (player.mediaPlayer.isPlaying()) {
@@ -391,7 +390,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
                 } else {
                     mControl.setImageResource(R.drawable.play_rdi_btn_pause);
                     player.mediaPlayer.start();
-                    if(mAnimatorSet != null){
+                    if (mAnimatorSet != null) {
                         mAnimatorSet.start();
                     }
                 }
@@ -558,7 +557,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         Fragment fragment = (RoundFragment) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
         if (fragment != null) {
             View v = fragment.getView();
-            if(mViewWeakReference.get() != v && v != null){
+            if (mViewWeakReference.get() != v && v != null) {
                 ((ViewGroup) v).setAnimationCacheEnabled(false);
                 if (mViewWeakReference != null)
                     mViewWeakReference.clear();
@@ -573,20 +572,20 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
         mAnimatorSet = new AnimatorSet();
 //        if (player.mediaPlayer.isPlaying()) {
-            mProgress.removeCallbacks(mUpdateProgress);
-            mProgress.postDelayed(mUpdateProgress, 200);
-            mControl.setImageResource(R.drawable.play_rdi_btn_pause);
-            if (mAnimatorSet != null && mRotateAnim != null && !mRotateAnim.isRunning()) {
-                //修复从playactivity回到Main界面null
-                if (mNeedleAnim == null) {
-                    mNeedleAnim = ObjectAnimator.ofFloat(mNeedle, "rotation", -30, 0);
-                    mNeedleAnim.setDuration(200);
-                    mNeedleAnim.setRepeatMode(0);
-                    mNeedleAnim.setInterpolator(new LinearInterpolator());
-                }
-                mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
-                mAnimatorSet.start();
+        mProgress.removeCallbacks(mUpdateProgress);
+        mProgress.postDelayed(mUpdateProgress, 200);
+        mControl.setImageResource(R.drawable.play_rdi_btn_pause);
+        if (mAnimatorSet != null && mRotateAnim != null && !mRotateAnim.isRunning()) {
+            //修复从playactivity回到Main界面null
+            if (mNeedleAnim == null) {
+                mNeedleAnim = ObjectAnimator.ofFloat(mNeedle, "rotation", -30, 0);
+                mNeedleAnim.setDuration(200);
+                mNeedleAnim.setRepeatMode(0);
+                mNeedleAnim.setInterpolator(new LinearInterpolator());
             }
+            mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
+            mAnimatorSet.start();
+        }
 
 //        }
 //        else {
@@ -655,7 +654,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
                     this.progress = progress * player.mediaPlayer.getDuration()
                             / seekBar.getMax();
                     //设置流动时间 这个地方每一次运行就开始有反应
-                    mTimePlayed.setText(MusicUtils.makeTimeString( player.mediaPlayer.getCurrentPosition()));
+                    mTimePlayed.setText(MusicUtils.makeTimeString(player.mediaPlayer.getCurrentPosition()));
 //                    mTimePlayed.setText(MusicUtils.makeTimeString( System.currentTimeMillis() ));
                 }
 
@@ -713,6 +712,10 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         super.onBackPressed();
         stopAnim();
         mProgress.removeCallbacks(mUpdateProgress);
+        finish();
+        player.mediaPlayer.release();
+        player.mediaPlayer.release();
+        player.mediaPlayer = null;
     }
 
 
