@@ -39,6 +39,7 @@ import com.joy.player.fragment.SimpleMoreFragment;
 import com.joy.player.handler.HandlerUtil;
 import com.joy.player.info.MusicInfo;
 import com.joy.player.json.SearchSongInfo2;
+import com.joy.player.provider.PlayOnlineFavoriteManager;
 import com.joy.player.util.*;
 import com.joy.player.widget.DefaultLrcParser;
 import com.joy.player.info.LrcRow;
@@ -72,7 +73,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     private FragmentAdapter mAdapter;
     private BitmapFactory.Options mNewOpts;
     private View mActiveView;
-    private PlaylistsManager mPlaylistsManager;
+    private PlayOnlineFavoriteManager mPlaylistsManager;
     private WeakReference<ObjectAnimator> animatorWeakReference;
     private WeakReference<View> mViewWeakReference = new WeakReference<View>(null);
     private boolean isFav = false;
@@ -110,7 +111,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playingonline);
         //播放管理界面
-        mPlaylistsManager = PlaylistsManager.getInstance(this);
+        mPlaylistsManager = mPlaylistsManager.getInstance(this);
         model = getIntent().getParcelableExtra("musicinfo");
 
         //放歌曲名字和作者界面
@@ -434,14 +435,12 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
             public void onClick(View v) {
 
                 if (isFav) {
-                    mPlaylistsManager.removeItem(PlayingOnlineActivity.this, IConstants.FAV_PLAYLIST,
-                            MusicPlayer.getCurrentAudioId());
+                    mPlaylistsManager.removeItem(PlayingOnlineActivity.this, model.getId());
                     mFav.setImageResource(R.drawable.play_rdi_icn_love);
                     isFav = false;
                 } else {
                     try {
-                        MusicInfo info = MusicPlayer.getPlayinfos().get(MusicPlayer.getCurrentAudioId());
-                        mPlaylistsManager.insertMusic(PlayingOnlineActivity.this, IConstants.FAV_PLAYLIST, info);
+                        mPlaylistsManager.insertMusic(PlayingOnlineActivity.this, model);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -449,8 +448,6 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
                     isFav = true;
                 }
 
-                Intent intent = new Intent(IConstants.PLAYLIST_COUNT_CHANGED);
-                sendBroadcast(intent);
             }
         });
 

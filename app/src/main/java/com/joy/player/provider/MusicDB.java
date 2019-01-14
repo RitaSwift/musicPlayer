@@ -38,6 +38,7 @@ public class MusicDB extends SQLiteOpenHelper {
         SearchHistory.getInstance(mContext).onCreate(db);
         PlaylistInfo.getInstance(mContext).onCreate(db);
         PlaylistsManager.getInstance(mContext).onCreate(db);
+        PlayOnlineFavoriteManager.getInstance(mContext).onCreate(db);
         DownFileStore.getInstance(mContext).onCreate(db);
     }
 
