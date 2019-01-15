@@ -103,14 +103,16 @@ public class MainFragmentAdapter extends RecyclerView.Adapter<MainFragmentAdapte
                     if (playlist.albumArt != null)
                         itemHolder.albumArt.setImageURI(Uri.parse(playlist.albumArt));
                     itemHolder.title.setText(playlist.name);
-                    itemHolder.songcount.setText(playlist.songCount + "首");
+//                    itemHolder.songcount.setText(playlist.songCount + "首");
+                    itemHolder.songcount.setText("");
 
                 }
                 if (collectExpanded && !playlist.author.equals("local")) {
                     if (playlist.albumArt != null)
                         itemHolder.albumArt.setImageURI(Uri.parse(playlist.albumArt));
                     itemHolder.title.setText(playlist.name);
-                    itemHolder.songcount.setText(playlist.songCount + "首");
+//                    itemHolder.songcount.setText(playlist.songCount + "首");
+                    itemHolder.songcount.setText("");
                 }
                 setOnPlaylistListener(itemHolder, i, playlist.id, playlist.albumArt, playlist.name);
                 isLoveList = false;

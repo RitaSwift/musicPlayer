@@ -5,11 +5,11 @@ import android.os.Parcelable;
 
 public class SearchSongInfo2 implements Parcelable {
 
-    private String name;
-    private String id;
-    private String artist;
-    private String url;
-    private String duration;
+    public String name;
+    public String id;
+    public String artist;
+    public String url;
+    public String duration;
 
     protected SearchSongInfo2(Parcel in) {
         name = in.readString();
@@ -17,6 +17,8 @@ public class SearchSongInfo2 implements Parcelable {
         artist = in.readString();
         url = in.readString();
         duration = in.readString();
+    }
+    public SearchSongInfo2() {
     }
 
     @Override

@@ -50,6 +50,7 @@ public class MusicDB extends SQLiteOpenHelper {
         SearchHistory.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         PlaylistInfo.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         PlaylistsManager.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
+        PlayOnlineFavoriteManager.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
         DownFileStore.getInstance(mContext).onUpgrade(db, oldVersion, newVersion);
     }
 
@@ -61,6 +62,7 @@ public class MusicDB extends SQLiteOpenHelper {
         SearchHistory.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
         PlaylistInfo.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
         PlaylistsManager.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
+        PlayOnlineFavoriteManager.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
         DownFileStore.getInstance(mContext).onDowngrade(db, oldVersion, newVersion);
     }
 }
