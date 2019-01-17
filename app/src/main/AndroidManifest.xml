@@ -74,6 +74,7 @@
                 android:screenOrientation="portrait" />
         <activity android:name=".activity.DownActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.PlaylistActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".activity.PlaylistLikedActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.RecentActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.NetItemChangeActivity" android:screenOrientation="portrait"/>
         <activity android:name=".activity.ArtistDetailActivity" android:screenOrientation="portrait"/>

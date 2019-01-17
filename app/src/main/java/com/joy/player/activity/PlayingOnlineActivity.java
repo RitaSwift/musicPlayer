@@ -11,8 +11,10 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.*;
-import android.support.annotation.Nullable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -23,15 +25,6 @@ import android.view.*;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.*;
-import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.joy.player.R;
 import com.joy.player.fragment.PlayQueueFragment;
 import com.joy.player.fragment.RoundFragment;
@@ -40,22 +33,17 @@ import com.joy.player.handler.HandlerUtil;
 import com.joy.player.info.MusicInfo;
 import com.joy.player.json.SearchSongInfo2;
 import com.joy.player.provider.PlayOnlineFavoriteManager;
-import com.joy.player.util.*;
-import com.joy.player.widget.DefaultLrcParser;
-import com.joy.player.info.LrcRow;
-import com.joy.player.widget.LrcView;
-import com.joy.player.provider.PlaylistsManager;
 import com.joy.player.service.MediaService;
 import com.joy.player.service.MusicPlayer;
+import com.joy.player.util.IConstants;
+import com.joy.player.util.MusicUtils;
+import com.joy.player.util.Player;
 import com.joy.player.widget.AlbumViewPager;
+import com.joy.player.widget.LrcView;
 import com.joy.player.widget.PlayerSeekBar;
 
-import java.io.*;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.List;
-
-import static com.joy.player.service.MusicPlayer.getAlbumPath;
 
 
 /**
@@ -113,6 +101,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         //播放管理界面
         mPlaylistsManager = mPlaylistsManager.getInstance(this);
         model = getIntent().getParcelableExtra("musicinfo");
+        isFav = getIntent().getBooleanExtra("isFav", false);
 
         //放歌曲名字和作者界面
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -184,7 +173,11 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
         mPlayThread.start();
 
         initView();
-
+        if (isFav) {
+            mFav.setImageResource(R.drawable.play_icn_loved);
+        } else {
+            mFav.setImageResource(R.drawable.play_icn_love);
+        }
     }
 
     private void initView() {
@@ -506,6 +499,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
         //设置ViewPager的默认项
         mViewPager.setCurrentItem(MusicPlayer.getQueuePosition() + 1);
+
     }
 
     @Override

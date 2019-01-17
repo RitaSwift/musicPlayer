@@ -224,14 +224,16 @@ public class MainFragmentAdapter extends RecyclerView.Adapter<MainFragmentAdapte
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        Intent intent = new Intent(mContext, PlaylistActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        intent.putExtra("islocal", true);
-                        intent.putExtra("playlistid", playlistid + "");
-                        intent.putExtra("albumart", albumArt);
-                        intent.putExtra("playlistname", playlistname);
-                        mContext.startActivity(intent);
+//                        Intent intent = new Intent(mContext, PlaylistActivity.class);
+//                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//                        intent.putExtra("islocal", true);
+//                        intent.putExtra("playlistid", playlistid + "");
+//                        intent.putExtra("albumart", albumArt);
+//                        intent.putExtra("playlistname", playlistname);
+//                        mContext.startActivity(intent);
 
+                        Intent intent = new Intent(mContext, PlaylistLikedActivity.class);
+                        mContext.startActivity(intent);
                     }
                 }, 60);
 

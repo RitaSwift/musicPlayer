@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+    <com.joy.player.widget.TintToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/theme_color_primary"
+            android:clipToPadding="false"
+            android:fitsSystemWindows="true"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/Theme.AppCompat"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize">
+
+            <TextView
+                    android:id="@+id/toolbar_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/bar_search"
+                    android:text="歌单"
+                    android:textColor="@color/white_text"
+                    android:textSize="20sp"/>
+
+            <ImageView
+                    android:id="@+id/bar_search"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/actionbar_search"/>
+        </RelativeLayout>
+    </com.joy.player.widget.TintToolbar>
+    <ListView
+            android:id="@+id/listview_fav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:dividerHeight="4px"
+            android:divider="#FFCC00" >
+    </ListView>
+
+</RelativeLayout>

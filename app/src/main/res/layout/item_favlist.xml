@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="300dp"
+              android:layout_height="70dp"
+              android:background="@color/menu_transparent"
+              android:descendantFocusability="blocksDescendants"
+              android:padding="40dp">
+    <TextView
+            android:id="@+id/fav_songname"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:textSize="16sp"
+            android:text="songname"
+            android:textColor="#000000"
+    android:focusable="false"/>
+    <TextView
+            android:id="@+id/fav_songartist"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:textSize="13sp"
+            android:text="songartist"
+            android:focusable="false"
+            android:textColor="#000000"/>
+
+</LinearLayout>
