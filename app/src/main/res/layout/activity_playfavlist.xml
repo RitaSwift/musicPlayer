@@ -9,26 +9,27 @@
                     android:id="@+id/recyclerview_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-        <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-                                                                                  android:id="@+id/recyclerview"
-                                                                                  android:visibility="gone"
-                                                                                  android:layout_width="match_parent"
-                                                                                  android:layout_height="match_parent"
-                                                                                  android:layout_above="@+id/empty" />
+        <com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/recyclerview"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/empty"/>
         <ImageView
                 android:id="@+id/empty"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_alignParentBottom="true" />
+                android:layout_alignParentBottom="true"/>
     </RelativeLayout>
-    <include layout="@layout/recycler_header" />
+    <include layout="@layout/recycler_header"/>
     <android.support.v7.widget.Toolbar
             android:theme="@style/Theme.AppCompat"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:subtitleTextAppearance="@style/Toolbar.SubTitle"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
 
     <FrameLayout
             android:id="@+id/state_container"
@@ -44,12 +45,12 @@
                 android:layout_gravity="center_horizontal"
                 android:text="请连接网络后点击屏幕重试"
                 android:layout_width="match_parent"
-                android:layout_height="60dp" />
+                android:layout_height="60dp"/>
     </FrameLayout>
 
     <FrameLayout
             android:id="@+id/bottom_container"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_gravity="end|bottom" />
+            android:layout_gravity="end|bottom"/>
 </FrameLayout>
