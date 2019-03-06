@@ -121,9 +121,9 @@ public class TabPagerFragment extends AttachDialogFragment {
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getChildFragmentManager());
         adapter.addFragment(new MusicFragment(), title[0]);
-        //0107 屏蔽本地音乐中别的功能
-//        adapter.addFragment(new ArtistFragment(), title[1]);
-//        adapter.addFragment(new AlbumFragment(), title[2]);
+        //0107 本地音乐中别的功能
+        adapter.addFragment(new ArtistFragment(), title[1]);
+        adapter.addFragment(new AlbumFragment(), title[2]);
 //        adapter.addFragment(new FolderFragment(), title[3]);
 
         viewPager.setAdapter(adapter);
