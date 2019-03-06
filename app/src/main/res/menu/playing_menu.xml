@@ -3,12 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-   <!-- 0107 屏蔽分享功能-->
+   <!-- 0107 分享功能-->
     <item
         android:id="@+id/menu_share"
         android:icon="@drawable/actionbar_share"
         android:title=""
-        app:showAsAction="ifRoom|collapseActionView"
-    android:visible="false"></item>
+        app:showAsAction="ifRoom|collapseActionView"></item>
 
 </menu>
