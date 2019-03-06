@@ -3,24 +3,25 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:id="@+id/hot_words_frame"
-    android:layout_height="match_parent"
-android:visibility="gone">
-<!--    0107 屏蔽功能-->
+    android:layout_height="match_parent">
 
+    <!--历史关键词-->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="26dp"
         android:textSize="14sp"
         android:layout_marginLeft="16dp"
-        android:text="热门搜索" />
+        android:text="热门搜索"
+    android:visibility="gone"/>
 
     <FrameLayout
         android:id="@+id/hot_words"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="50dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+    android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
