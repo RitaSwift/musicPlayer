@@ -11,6 +11,7 @@ import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.joy.player.R;
 import com.joy.player.handler.HandlerUtil;
@@ -30,6 +31,7 @@ public class LoginActivity extends Activity {
     private Button loginBtn;
     private EditText usernameEt;
     private EditText passwordEt;
+    private TextView changePwd;
     private static final int REGISTER_FAIL = 0;
     private static final int REGISTER_SUCCESS = 1;
     private static final int LOGIN_FAIL = 2;
@@ -75,6 +77,7 @@ public class LoginActivity extends Activity {
         loginBtn = findViewById(R.id.login_btn_login);
         usernameEt = findViewById(R.id.login_edit_account);
         passwordEt = findViewById(R.id.login_edit_pwd);
+        changePwd = findViewById(R.id.login_text_change_pwd);
         setListeners();
         HandlerUtil.getInstance(this).postDelayed(new Runnable() {
             @Override
@@ -110,6 +113,13 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View view) {
                 performLoginRequest(usernameEt.getText().toString(),passwordEt.getText().toString());
+            }
+        });
+        changePwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this,ResetpwdActivity.class);
+                startActivity(intent);
             }
         });
     }

@@ -65,6 +65,17 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"/>
 
+
+        <TextView
+                android:layout_width="60dp"
+                android:layout_height="20dp"
+                android:text="修改密码"
+                android:id="@+id/login_text_change_pwd"
+                android:layout_below="@+id/login_edit_pwd"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:textSize="15dp"/>
+
         <EditText
                 android:layout_width="400dp"
                 android:layout_height="60dp"
