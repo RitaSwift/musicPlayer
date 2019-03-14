@@ -165,13 +165,20 @@
                     android:layout_marginTop="-10dp"
                     android:orientation="horizontal">
 
+                <ProgressBar
+                        android:id="@+id/downloadprogressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dip"
+                android:visibility="gone"/>
+
                 <ImageView
                         android:id="@+id/playing_fav"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
-                        android:src="@drawable/play_rdi_icn_love" />
+                        android:src="@drawable/play_rdi_icn_love"/>
 
                 <ImageView
                         android:id="@+id/playing_down"
@@ -179,10 +186,9 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
-                        android:src="@drawable/play_icn_dlded_dis"
-                        android:visibility="gone"/>
+                        android:src="@drawable/play_icn_dlded"/>
 
-                <!--0107 屏蔽下载按钮-->
+                <!--0107 屏蔽更多按钮-->
                 <ImageView
                         android:id="@+id/playing_cmt"
                         android:layout_width="wrap_content"
@@ -190,7 +196,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
                         android:src="@drawable/play_icn_cmt_number_dis"
-                        android:visibility="gone"/>
+                android:visibility="gone"/>
 
                 <!--0107 屏蔽更多按钮-->
                 <ImageView

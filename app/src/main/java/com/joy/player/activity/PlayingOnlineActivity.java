@@ -11,10 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.os.*;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -26,6 +23,7 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.*;
 import com.joy.player.R;
+import com.joy.player.downmusic.DownloadTask;
 import com.joy.player.fragment.PlayQueueFragment;
 import com.joy.player.fragment.RoundFragment;
 import com.joy.player.fragment.SimpleMoreFragment;
@@ -33,17 +31,19 @@ import com.joy.player.handler.HandlerUtil;
 import com.joy.player.info.MusicInfo;
 import com.joy.player.json.SearchSongInfo2;
 import com.joy.player.provider.PlayOnlineFavoriteManager;
+import com.joy.player.proxy.utils.Constants;
 import com.joy.player.service.MediaService;
 import com.joy.player.service.MusicPlayer;
-import com.joy.player.util.IConstants;
-import com.joy.player.util.MusicUtils;
-import com.joy.player.util.Player;
+import com.joy.player.util.*;
 import com.joy.player.widget.AlbumViewPager;
 import com.joy.player.widget.LrcView;
 import com.joy.player.widget.PlayerSeekBar;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.net.URLEncoder;
 
 
 /**
@@ -88,6 +88,35 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
     private SearchSongInfo2 model;
     private Player player;
 
+    private static final int PROCESSING = 1;
+    private static final int FAILURE = -1;
+
+    private ProgressBar downloadProgressBar;
+
+    private Handler handler = new UIHandler();
+
+    private final class UIHandler extends Handler {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case PROCESSING:
+                    downloadProgressBar.setProgress(msg.getData().getInt("size"));
+                    float num = (float) downloadProgressBar.getProgress()
+                            / (float) downloadProgressBar.getMax();
+                    if (downloadProgressBar.getProgress() == downloadProgressBar.getMax()) { // �������
+                        Toast.makeText(getApplicationContext(), "下载成功",
+                                Toast.LENGTH_LONG).show();
+
+                        mDown.setImageResource(R.drawable.play_icn_dlded_dis);
+                    }
+                    break;
+                case FAILURE:
+                    Toast.makeText(getApplicationContext(), "下载失败",
+                            Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    }
+
 
     @Override
     protected void showQuickControl(boolean show) {
@@ -105,6 +134,7 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
         //放歌曲名字和作者界面
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        downloadProgressBar = findViewById(R.id.downloadprogressBar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             ab = getSupportActionBar();
@@ -212,6 +242,40 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
             }
         });
 
+        //下载功能
+        mDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String path = model.getUrl();
+                String filename = path.substring(path.lastIndexOf('/') + 1);
+
+                try {
+                    filename = URLEncoder.encode(filename, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                path = path.substring(0, path.lastIndexOf("/") + 1) + filename;
+                if (Environment.getExternalStorageState().equals(
+                        Environment.MEDIA_MOUNTED)) {
+//                    File savDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+//                    File savDir1 = Environment.getExternalStorageDirectory();
+                    /**
+                     * 03-11 18:20:27.620 9635-9635/com.joy.player.musicplayer I/System.out: /storage/emulated/0
+                     *     保存的路径为：/storage/emulated/0/Movies
+                     */
+                    File savDir1 = new File(Constants.DOWNLOAD_PATH);
+//                    System.out.println(savDir1);
+                    System.out.println("url:" + model.getUrl());
+
+                    download(path, savDir1);
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "rrr", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
         mTryGetLrc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -243,6 +307,49 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
 
             }
         });
+    }
+
+    private void download(String path, File savDir) {
+        DownloadTask task = new DownloadTask(path, savDir);
+        new Thread(task).start();
+    }
+
+    private final class DownloadTask implements Runnable {
+        private String path;
+        private File saveDir;
+        private FileDownloader loader;
+
+        public DownloadTask(String path, File saveDir) {
+            this.path = path;
+            this.saveDir = saveDir;
+        }
+
+        public void exit() {
+            if (loader != null)
+                loader.exit();
+        }
+
+        DownloadProgressListener downloadProgressListener = new DownloadProgressListener() {
+            @Override
+            public void onDownloadSize(int size) {
+                Message msg = new Message();
+                msg.what = PROCESSING;
+                msg.getData().putInt("size", size);
+                handler.sendMessage(msg);
+            }
+        };
+
+        public void run() {
+            try {
+                loader = new FileDownloader(getApplicationContext(), path,
+                        saveDir, 3);
+                downloadProgressBar.setMax(loader.getFileSize());
+                loader.download(downloadProgressListener);
+            } catch (Exception e) {
+                e.printStackTrace();
+                handler.sendMessage(handler.obtainMessage(FAILURE));
+            }
+        }
     }
 
 
@@ -577,22 +684,6 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
             mAnimatorSet.play(mNeedleAnim).before(mRotateAnim);
             mAnimatorSet.start();
         }
-
-//        }
-//        else {
-//            mProgress.removeCallbacks(mUpdateProgress);
-//            mControl.setImageResource(R.drawable.play_rdi_btn_play);
-//            if (mNeedleAnim != null) {
-//                mNeedleAnim.reverse();
-//                mNeedleAnim.end();
-//            }
-//
-//            if (mRotateAnim != null && mRotateAnim.isRunning()) {
-//                mRotateAnim.cancel();
-//                float valueAvatar = (float) mRotateAnim.getAnimatedValue();
-//                mRotateAnim.setFloatValues(valueAvatar, 360f + valueAvatar);
-//            }
-//        }
 
         isNextOrPreSetPage = false;
         if (MusicPlayer.getQueuePosition() + 1 != mViewPager.getCurrentItem()) {
