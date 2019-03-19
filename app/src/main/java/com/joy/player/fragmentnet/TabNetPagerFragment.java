@@ -86,11 +86,11 @@ public class TabNetPagerFragment extends AttachFragment implements ChangeView {
         recommendFragment = new RecommendFragment();
         recommendFragment.setChanger(this);
 //        0107屏蔽歌单和排行榜两个
-//        adapter.addFragment(recommendFragment, "新曲");
-        adapter.addFragment(recommendFragment, "推荐");
+        adapter.addFragment(recommendFragment, "新曲");
+//        adapter.addFragment(recommendFragment, "推荐");
 //        adapter.addFragment(new AllPlaylistFragment(), "歌单");
         //  adapter.addFragment(new NetFragment(), "主播电台");
-//        adapter.addFragment(new RankingFragment(), "排行榜");
+        adapter.addFragment(new RankingFragment(), "排行榜");
 
         viewPager.setAdapter(adapter);
     }

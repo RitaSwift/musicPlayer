@@ -26,8 +26,7 @@
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@+id/bar_music"
                 android:background="@drawable/actionbar_disco"
-                android:clickable="true"
-                android:visibility="gone"/>
+                android:clickable="true"/>
 
             <ImageView
                 android:id="@+id/bar_music"

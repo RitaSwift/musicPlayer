@@ -107,6 +107,10 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
                                 Toast.LENGTH_LONG).show();
 
                         mDown.setImageResource(R.drawable.play_icn_dlded_dis);
+                        String savePath = Constants.DOWNLOAD_PATH  + "/" + model.getName();
+                        Uri contentUri = Uri.fromFile(new File(savePath));
+                        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,contentUri);
+                        sendBroadcast(mediaScanIntent);
                     }
                     break;
                 case FAILURE:
@@ -267,8 +271,14 @@ public class PlayingOnlineActivity extends BaseActivity implements IConstants {
                     File savDir1 = new File(Constants.DOWNLOAD_PATH);
 //                    System.out.println(savDir1);
                     System.out.println("url:" + model.getUrl());
+                    //android 媒体文件通知媒体数据库更新 不行 报错
+//                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
+//                            Uri.parse("file://"
+//                                    + Environment
+//                                    .getExternalStorageDirectory())));
 
                     download(path, savDir1);
+
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "rrr", Toast.LENGTH_LONG).show();
