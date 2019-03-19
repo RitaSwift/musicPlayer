@@ -58,6 +58,7 @@ public class RecommendFragment extends AttachFragment {
     private NewAlbumsAdapter mNewAlbumsAdapter;
     private RadioAdapter mRadioAdapter;
 
+    //mRecomendList是推荐歌单的信息
     private ArrayList<RecommendListRecommendInfo> mRecomendList = new ArrayList<>();
     private ArrayList<RecommendListNewAlbumInfo> mNewAlbumsList = new ArrayList<>();
     private ArrayList<RecommendListRadioInfo> mRadioList = new ArrayList<>();
@@ -72,6 +73,7 @@ public class RecommendFragment extends AttachFragment {
     private boolean isDayFirst;
     private ViewGroup mContent;
     private View mRecommendView;
+    //轮播图片
     private LoodView mLoodView;
 
     public void setChanger(ChangeView changer) {
@@ -125,6 +127,16 @@ public class RecommendFragment extends AttachFragment {
             mContent.addView(mRecommendView);
         }
 
+        RecommendListRecommendInfo info = new RecommendListRecommendInfo();
+        info.setPic("http://business.cdn.qianqian.com/qianqian/pic/bos_client_e0958e5ded6b5eaaf579218077b0d69f.jpg");
+        info.setCollectnum("523");
+        info.setListid("6910");
+        info.setTag("华语,流行,散步");
+        info.setTitle("歌声里装了一个世界，大气女声来袭");
+        info.setListenum("38349");
+        info.setType("gedan");
+        mRecomendList.add(info);
+
         return mContent;
     }
 
@@ -163,7 +175,7 @@ public class RecommendFragment extends AttachFragment {
 
 
                     for (int i = 0; i < 6; i++) {
-                        mRecomendList.add(MainApplication.gsonInstance().fromJson(recommendArray.get(i), RecommendListRecommendInfo.class));
+//                        mRecomendList.add(MainApplication.gsonInstance().fromJson(recommendArray.get(i), RecommendListRecommendInfo.class));
                         mNewAlbumsList.add(MainApplication.gsonInstance().fromJson(newAlbumArray.get(i), RecommendListNewAlbumInfo.class));
                         mRadioList.add(MainApplication.gsonInstance().fromJson(radioArray.get(i), RecommendListRadioInfo.class));
                     }
@@ -253,7 +265,7 @@ public class RecommendFragment extends AttachFragment {
 
 
                 for (int i = 0; i < 6; i++) {
-                    mRecomendList.add(MainApplication.gsonInstance().fromJson(recommendArray.get(i), RecommendListRecommendInfo.class));
+//                    mRecomendList.add(MainApplication.gsonInstance().fromJson(recommendArray.get(i), RecommendListRecommendInfo.class));
                     mNewAlbumsList.add(MainApplication.gsonInstance().fromJson(newAlbumArray.get(i), RecommendListNewAlbumInfo.class));
                     mRadioList.add(MainApplication.gsonInstance().fromJson(radioArray.get(i), RecommendListRadioInfo.class));
                 }
@@ -266,24 +278,24 @@ public class RecommendFragment extends AttachFragment {
 
         @Override
         protected void onPostExecute(Integer tryCount) {
-            if (mRecomendList.size() != 6 && mNewAlbumsList.size() != 6 && mRadioList.size() != 6) {
-                if (tryCount < 5) {
-                    tryCount++;
-                    new LoadRecommend().execute(tryCount);
-                } else {
-                    Toast.makeText(mContext, "网络连接失败", Toast.LENGTH_SHORT).show();
-                    View tryAgain = LayoutInflater.from(mContext).inflate(R.layout.try_again, mViewContent, false);
-                    tryAgain.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            new LoadRecommend().execute(0);
-                        }
-                    });
-                    mViewContent.removeView(mLoadView);
-                    mViewContent.addView(tryAgain);
-                }
-
-            }
+//            if (mRecomendList.size() != 6 && mNewAlbumsList.size() != 6 && mRadioList.size() != 6) {
+//                if (tryCount < 5) {
+//                    tryCount++;
+//                    new LoadRecommend().execute(tryCount);
+//                } else {
+//                    Toast.makeText(mContext, "网络连接失败", Toast.LENGTH_SHORT).show();
+//                    View tryAgain = LayoutInflater.from(mContext).inflate(R.layout.try_again, mViewContent, false);
+//                    tryAgain.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            new LoadRecommend().execute(0);
+//                        }
+//                    });
+//                    mViewContent.removeView(mLoadView);
+//                    mViewContent.addView(tryAgain);
+//                }
+//
+//            }
 
             v1 = mLayoutInflater.inflate(R.layout.recommend_playlist, mViewContent, false);
             mRecyclerView1 = (RecyclerView) v1.findViewById(R.id.recommend_playlist_recyclerview);
