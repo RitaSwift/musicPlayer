@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -27,15 +29,12 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.joy.player.MainApplication;
 import com.joy.player.R;
-import com.joy.player.activity.AlbumsDetailActivity;
-import com.joy.player.activity.NetItemChangeActivity;
-import com.joy.player.activity.PlaylistActivity;
-import com.joy.player.activity.RadioDetailActivity;
+import com.joy.player.activity.*;
 import com.joy.player.fragment.AttachFragment;
+import com.joy.player.json.GedanInfo;
 import com.joy.player.json.RecommendListNewAlbumInfo;
 import com.joy.player.json.RecommendListRadioInfo;
 import com.joy.player.json.RecommendListRecommendInfo;
@@ -43,7 +42,10 @@ import com.joy.player.net.HttpUtil;
 import com.joy.player.net.NetworkUtils;
 import com.joy.player.util.PreferencesUtility;
 import com.joy.player.widget.LoodView;
+import com.squareup.okhttp.*;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -63,7 +65,8 @@ public class RecommendFragment extends AttachFragment {
     private ArrayList<RecommendListNewAlbumInfo> mNewAlbumsList = new ArrayList<>();
     private ArrayList<RecommendListRadioInfo> mRadioList = new ArrayList<>();
     private int width = 160, height = 160;
-    private LinearLayout mItemLayout ,mViewContent;;
+    private LinearLayout mItemLayout, mViewContent;
+    ;
     private LayoutInflater mLayoutInflater;
     private View mLoadView, v1, v2, v3;
     private HashMap<String, View> mViewHashMap;
@@ -76,6 +79,29 @@ public class RecommendFragment extends AttachFragment {
     //轮播图片
     private LoodView mLoodView;
 
+
+    private static final int GEDAN_SUCCESS = 0;
+    private static final int GEDAN_FAILED = 1;
+    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");//mdiatype 这个需要和服务端保持一致
+    private static final MediaType MEDIA_TYPE_MARKDOWN = MediaType.parse("text/plain; charset=UTF-8");//mdiatype 这个需要和服务端保持一致
+    private static final String BASE_URL = "http://47.100.245.211:8888";//请求接口根地址
+
+    private Handler requestHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case GEDAN_SUCCESS:
+                    mRecomendAdapter.update(mRecomendList);
+                    break;
+                case GEDAN_FAILED:
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    };
+
+
     public void setChanger(ChangeView changer) {
         mChangeView = changer;
     }
@@ -85,17 +111,17 @@ public class RecommendFragment extends AttachFragment {
         mContent = (ViewGroup) inflater.inflate(R.layout.fragment_recommend_container, container, false);
 
         mLayoutInflater = LayoutInflater.from(mContext);
-        mRecommendView = mLayoutInflater.inflate(R.layout.recommend,container,false);
+        mRecommendView = mLayoutInflater.inflate(R.layout.recommend, container, false);
         String date = Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "";
         TextView dailyText = (TextView) mRecommendView.findViewById(R.id.daily_text);
         dailyText.setText(date);
         mItemLayout = (LinearLayout) mRecommendView.findViewById(R.id.item_change);
         mViewContent = (LinearLayout) mRecommendView.findViewById(R.id.recommend_layout);
-        if(!PreferencesUtility.getInstance(mContext).isCurrentDayFirst(date)){
+        if (!PreferencesUtility.getInstance(mContext).isCurrentDayFirst(date)) {
             PreferencesUtility.getInstance(mContext).setCurrentDate(date);
-            View dayRec = mLayoutInflater.inflate(R.layout.loading_daymusic,container,false);
-            ImageView view1 = (ImageView) dayRec.findViewById(R.id.loading_dayimage) ;
-            RotateAnimation rotateAnimation = new RotateAnimation(0,360, 1, 0.5F, 1, 0.5F );
+            View dayRec = mLayoutInflater.inflate(R.layout.loading_daymusic, container, false);
+            ImageView view1 = (ImageView) dayRec.findViewById(R.id.loading_dayimage);
+            RotateAnimation rotateAnimation = new RotateAnimation(0, 360, 1, 0.5F, 1, 0.5F);
             rotateAnimation.setDuration(20000L);
             rotateAnimation.setInterpolator(new LinearInterpolator());
             rotateAnimation.setRepeatCount(Animation.INFINITE);
@@ -123,33 +149,70 @@ public class RecommendFragment extends AttachFragment {
         });
 
         mLoodView = (LoodView) mRecommendView.findViewById(R.id.loop_view);
-        if(!isDayFirst){
+        if (!isDayFirst) {
             mContent.addView(mRecommendView);
         }
 
-        RecommendListRecommendInfo info = new RecommendListRecommendInfo();
-        info.setPic("http://business.cdn.qianqian.com/qianqian/pic/bos_client_e0958e5ded6b5eaaf579218077b0d69f.jpg");
-        info.setCollectnum("523");
-        info.setListid("6910");
-        info.setTag("华语,流行,散步");
-        info.setTitle("歌声里装了一个世界，大气女声来袭");
-        info.setListenum("38349");
-        info.setType("gedan");
-        mRecomendList.add(info);
+        performGedanRequest();
 
         return mContent;
+    }
+
+
+    private void performGedanRequest() {
+        Runnable requestTask = new Runnable() {
+            @Override
+            public void run() {
+                Message msg = requestHandler.obtainMessage();
+                try {
+                    OkHttpClient client = new OkHttpClient();
+                    String url = BASE_URL + "/gedan?userid=admin";
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .build();
+                    Call call = client.newCall(request);
+                    // 1
+                    Response response = call.execute();
+
+                    if (!response.isSuccessful()) {
+                        msg.what = GEDAN_FAILED;
+                    } else {
+                        Gson gson = new Gson();
+                        msg.what = GEDAN_SUCCESS;
+                        String string = response.body().string();
+                        JsonParser parser = new JsonParser();
+                        JsonElement el = parser.parse(string);
+                        JsonArray asJsonArray = el.getAsJsonArray();
+
+                        int length = asJsonArray.size();
+
+                        for (int i = 0; i < length; i++) {
+                            RecommendListRecommendInfo info = gson.fromJson(asJsonArray.get(i), RecommendListRecommendInfo.class);
+                            mRecomendList.add(info);
+                        }
+                    }
+                } catch (IOException ex) {
+                    msg.what = GEDAN_FAILED;
+                } finally {
+                    msg.sendToTarget();
+                }
+            }
+        };
+
+        Thread requestThread = new Thread(requestTask);
+        requestThread.start();
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser){
-            if(mLoodView != null)
-            mLoodView.requestFocus();
+        if (isVisibleToUser) {
+            if (mLoodView != null)
+                mLoodView.requestFocus();
         }
     }
 
-    public void requestData(){
+    public void requestData() {
         reloadAdapter();
     }
 
@@ -229,7 +292,7 @@ public class RecommendFragment extends AttachFragment {
                 mViewHashMap.put("主播电台", v3);
                 mPosition = PreferencesUtility.getInstance(mContext).getItemPosition();
                 mViewContent.removeView(mLoadView);
-                if(isDayFirst){
+                if (isDayFirst) {
                     mContent.removeAllViews();
                     mContent.addView(mRecommendView);
                 }
@@ -242,7 +305,6 @@ public class RecommendFragment extends AttachFragment {
 
         }.execute();
     }
-
 
 
     class LoadRecommend extends AsyncTask<Integer, Void, Integer> {
